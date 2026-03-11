@@ -20,6 +20,10 @@ export default (sequelize) => {
     passwordHash: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    refreshToken: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     timestamps: true
