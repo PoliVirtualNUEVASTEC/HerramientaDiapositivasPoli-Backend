@@ -14,44 +14,44 @@ export const SlideImage = SlideImageModel(sequelize)
 
 // User -> PasswordResetToken
 User.hasMany(PasswordResetToken, {
-  foreignKey: 'user_id',
+  foreignKey: 'userId',
   as: 'password_reset_tokens'
 })
 
 PasswordResetToken.belongsTo(User, {
-  foreignKey: 'user_id',
+  foreignKey: 'userId',
   as: 'user'
 })
 
 // User -> Presentation
 User.hasMany(Presentation, {
-  foreignKey: 'user_id',
+  foreignKey: 'userId',
   as: 'presentations'
 })
 
 Presentation.belongsTo(User, {
-  foreignKey: 'user_id',
+  foreignKey: 'userId',
   as: 'user'
 })
 
 // Presentation -> Slide
 Presentation.hasMany(Slide, {
-  foreignKey: 'presentation_id',
+  foreignKey: 'presentationId',
   as: 'slides'
 })
 
 Slide.belongsTo(Presentation, {
-  foreignKey: 'presentation_id',
+  foreignKey: 'presentationId',
   as: 'presentation'
 })
 
 // Slide -> SlideImage
 Slide.hasMany(SlideImage, {
-  foreignKey: 'slide_id',
+  foreignKey: 'slideId',
   as: 'slide_images'
 })
 
 SlideImage.belongsTo(Slide, {
-  foreignKey: 'slide_id',
+  foreignKey: 'slideId',
   as: 'slide'
 })
