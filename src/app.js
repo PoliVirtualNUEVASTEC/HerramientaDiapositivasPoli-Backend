@@ -5,6 +5,7 @@ import 'dotenv/config'
 
 import { userRoutes } from './routes/user.routes.js'
 import { loginRoutes } from './routes/login.routes.js'
+import { presentationRoutes } from './routes/presentation.routes.js'
 
 export const app = express()
 app.use(express.json())
@@ -16,3 +17,4 @@ app.use(cors({
 
 app.use('/api/users/', userRoutes)
 app.use('/api/auth/', loginRoutes)
+app.use('/api/presentations', presentationRoutes)
