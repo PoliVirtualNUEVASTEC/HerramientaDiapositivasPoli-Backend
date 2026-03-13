@@ -44,7 +44,7 @@ export class LoginController {
     const refreshToken = req.cookies.refreshToken
 
     if (!refreshToken) {
-      return res.status(401).json({ message: 'No autorizado' })
+      return res.status(403).json({ message: 'No autorizado' })
     }
 
     try {
@@ -66,6 +66,7 @@ export class LoginController {
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
         sameSite: 'lax',
+        secure: false,
         maxAge: 15 * 60 * 1000
       })
 
@@ -96,5 +97,19 @@ export class LoginController {
     res.json({
       message: 'Logout exitoso'
     })
+  }
+
+  async getProfile (req, res) {
+    try {
+      const id = req.user.id
+      const user = await User.findByPk(id)
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' })
+      }
+      return res.json({ fullName: user.fullName, email: user.email })
+    } catch (error) {
+      console.error('Error fetching user:', error)
+      return res.status(500).json({ error: 'Failed to fetch user' })
+    }
   }
 }
