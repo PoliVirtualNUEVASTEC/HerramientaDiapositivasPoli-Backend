@@ -22,7 +22,7 @@ export const uploadMiddleware = (req, res, next) => {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ error: 'El archivo excede el límite de 10 MB' })
       }
-      return res.status(400).json({ error: `Error de carga: ${err.message}` })
+      return res.status(400).json({ error: `Error de carga: ${err}` })
     }
 
     if (err) {

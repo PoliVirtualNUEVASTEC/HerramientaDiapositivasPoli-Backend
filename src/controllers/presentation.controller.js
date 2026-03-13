@@ -1,22 +1,33 @@
-import { createRequire } from 'module'
-
+import { PDFParse } from 'pdf-parse'
 import { Presentation } from '../models/relations.js'
-const require = createRequire(import.meta.url)
-const pdfParse = require('pdf-parse')
 
 export class PresentationController {
   async createPresentationFromPDF (req, res) {
     try {
-      const { title } = req.body
-      const data = await pdfParse(req.file.buffer)
-      if (!data.text || data.text.trim().length === 0) {
+      const { title, description } = req.body
+
+      if (!req.file) {
+        return res.status(400).json({ error: 'No se envió ningún archivo PDF' })
+      }
+
+      const parser = new PDFParse({
+        data: req.file.buffer
+      })
+
+      const result = await parser.getText()
+
+      const pdfText = result.text
+
+      if (!pdfText || pdfText.trim().length === 0) {
         return res.status(400).json({ error: 'No se pudo extraer texto del PDF' })
       }
+
       const presentation = await Presentation.create({
         title: title || req.file.originalname.replace('.pdf', ''),
-        description: data.text.trim(),
+        description: description || 'Presentación generada desde PDF',
         userId: req.user.id
       })
+
       return res.status(201).json(presentation)
     } catch (error) {
       console.error('Error creating presentation from PDF:', error)
