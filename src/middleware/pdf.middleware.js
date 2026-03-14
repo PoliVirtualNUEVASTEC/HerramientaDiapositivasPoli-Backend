@@ -16,7 +16,7 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // 10 MB
 })
 
-export const uploadMiddleware = (req, res, next) => {
+export const pdfMiddleware = (req, res, next) => {
   upload.single('file')(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
@@ -32,7 +32,7 @@ export const uploadMiddleware = (req, res, next) => {
     if (!req.file) {
       return res.status(400).json({ error: 'No se recibió ningún archivo PDF' })
     }
-
+    console.log('PDF validado correctamente')
     next()
   })
 }
