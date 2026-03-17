@@ -2,12 +2,13 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { User } from '../models/relations.js'
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt.js'
+import { Op } from 'sequelize'
 
 export class LoginController {
   async login (req, res) {
     const { email, password } = req.body
 
-    const user = await User.findOne({ where: { email } })
+    const user = await User.findOne({ where: { email: { [Op.iLike]: email } } })
 
     if (!user) {
       return res.status(401).json({ message: 'Usuario no encontrado' })

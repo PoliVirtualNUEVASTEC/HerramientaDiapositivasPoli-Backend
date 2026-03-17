@@ -1,3 +1,4 @@
+import { Op } from 'sequelize'
 import { User } from '../models/relations.js'
 import bcrypt from 'bcrypt'
 
@@ -5,9 +6,14 @@ export class UserController {
   async createUser (req, res) {
     try {
       const { fullName, email, password } = req.body
+
+      const user = await User.findOne({ where: { email: { [Op.iLike]: email } } })
+
+      if (user) { return res.status(409).json({ error: 'User already exist' }) }
+
       const passwordHash = await bcrypt.hash(password, 10)
-      const user = await User.create({ fullName, email, passwordHash })
-      return res.status(201).json({ fullName: user.fullName, email: user.email })
+      const newUser = await User.create({ fullName, email, passwordHash })
+      return res.status(201).json({ fullName: newUser.fullName, email: newUser.email })
     } catch (error) {
       console.error('Error creating user:', error)
       return res.status(500).json({ error: 'Failed to create user' })
