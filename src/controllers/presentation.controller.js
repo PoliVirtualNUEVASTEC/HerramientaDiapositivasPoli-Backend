@@ -7,7 +7,9 @@ export class PresentationController {
       const { title, description } = req.body
 
       if (!req.file) {
-        return res.status(400).json({ error: 'No se envió ningún archivo PDF' })
+        return res.status(400).json({
+          error: 'No se envió ningún archivo PDF'
+        })
       }
 
       const parser = new PDFParse({
@@ -15,12 +17,27 @@ export class PresentationController {
       })
 
       const result = await parser.getText()
-
       const pdfText = result.text
+      const cleanText = pdfText.trim()
 
-      if (!pdfText || pdfText.trim().length === 0) {
-        return res.status(400).json({ error: 'No se pudo extraer texto del PDF' })
+      // Validación REAL de contenido
+      if (!cleanText || cleanText.length < 50 || cleanText.split(/\s+/).length < 10) {
+        return res.status(400).json({
+          error: 'El PDF no contiene texto suficiente o es un documento escaneado'
+        })
       }
+
+      // Guardar en RAM (lo importante para tu app)
+      const presentationText = cleanText
+
+      // Debug útil (solo preview)
+      console.log('Preview del PDF:')
+      console.log(presentationText.substring(0, 300))
+
+      // (opcional pero recomendado) procesar texto
+      const slides = presentationText.split('. ').slice(0, 5)
+
+      console.log('Slides generadas:', slides)
 
       const presentation = await Presentation.create({
         title: title || req.file.originalname.replace('.pdf', ''),
@@ -28,10 +45,17 @@ export class PresentationController {
         userId: req.user.id
       })
 
-      return res.status(201).json(presentation)
+      return res.status(201).json({
+        message: 'PDF procesado correctamente',
+        slidesPreview: slides,
+        presentation
+      })
     } catch (error) {
       console.error('Error creating presentation from PDF:', error)
-      return res.status(500).json({ error: 'Failed to create presentation from PDF' })
+
+      return res.status(500).json({
+        error: 'Failed to create presentation from PDF'
+      })
     }
   }
 
@@ -45,9 +69,16 @@ export class PresentationController {
         })
       }
 
-      const presentationText = text.trim() // queda en RAM
-      // aquí se procesará el texto
-      console.log(presentationText)
+      // Guardar en RAM
+      const presentationText = text.trim()
+
+      console.log('Texto recibido:')
+      console.log(presentationText.substring(0, 300))
+
+      // misma lógica que PDF
+      const slides = presentationText.split('. ').slice(0, 5)
+
+      console.log('Slides generadas:', slides)
 
       const presentation = await Presentation.create({
         title: 'Presentación desde texto',
@@ -56,7 +87,8 @@ export class PresentationController {
       })
 
       return res.status(201).json({
-        message: 'Texto recibido correctamente',
+        message: 'Texto procesado correctamente',
+        slidesPreview: slides,
         presentation
       })
     } catch (error) {
