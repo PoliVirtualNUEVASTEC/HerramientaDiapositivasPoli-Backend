@@ -1,8 +1,11 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { User } from '../models/relations.js'
+import { User, PasswordResetToken } from '../models/relations.js'
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt.js'
 import { Op } from 'sequelize'
+import crypto from 'crypto'
+
+import nodemailer from 'nodemailer'
 
 export class LoginController {
   async login (req, res) {
@@ -113,4 +116,92 @@ export class LoginController {
       return res.status(500).json({ error: 'Failed to fetch user' })
     }
   }
+
+  // POST /auth/forgot-password
+  async forgotPassword (req, res) {
+    const { email } = req.body
+
+    const user = await User.findOne({ where: { email } })
+
+    if (!user) {
+      return res.json({ message: 'Si el correo existe, se enviará un link' })
+    }
+
+    await PasswordResetToken.destroy({
+      where: { userId: user.id }
+    })
+
+    const token = crypto.randomBytes(32).toString('hex')
+
+    await PasswordResetToken.create({
+      userId: user.id,
+      token,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000)
+    })
+
+    const resetLink = `http://localhost:5173/reset-password?token=${token}`
+
+    await transporter.sendMail({
+      from: '"PresentAI" <no-reply@presentai.com>',
+      to: user.email,
+      subject: 'Recuperar contraseña',
+      html: `
+    <h2>Recuperación de contraseña</h2>
+    <p>Haz click en el siguiente enlace:</p>
+    <a href="${resetLink}">Restablecer contraseña</a>
+    <p>Este enlace expira en 30 minutos.</p>
+  `
+    })
+
+    res.json({ message: 'Correo enviado' })
+  }
+
+  // GET /auth/validate-reset-token?token=xxx
+  async validateToken (req, res) {
+    const { token } = req.query
+
+    const record = await PasswordResetToken.findOne({
+      where: { token }
+    })
+
+    if (!record) {
+      return res.status(400).json({ valid: false })
+    }
+
+    if (record.expiresAt < new Date()) {
+      return res.status(400).json({ valid: false, message: 'Token expirado' })
+    }
+
+    res.json({ valid: true })
+  }
+
+  // POST /auth/reset-password
+  async resetPassword (req, res) {
+    const { token, newPassword } = req.body
+
+    const record = await PasswordResetToken.findOne({
+      where: { token }
+    })
+
+    if (!record || record.expiresAt < new Date()) {
+      return res.status(400).json({ message: 'Token inválido o expirado' })
+    }
+
+    const user = await User.findByPk(record.userId)
+
+    user.password = await bcrypt.hash(newPassword, 10)
+    await user.save()
+
+    await record.destroy()
+
+    res.json({ message: 'Contraseña actualizada' })
+  }
 }
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASS
+  }
+})
