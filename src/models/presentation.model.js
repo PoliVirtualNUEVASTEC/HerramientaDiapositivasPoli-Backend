@@ -17,8 +17,18 @@ export default (sequelize) => {
       allowNull: false
     },
     description: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: DataTypes.TEXT
+    },
+    theme: {
+      type: DataTypes.JSONB
+    },
+    fontFamily: {
+      type: DataTypes.STRING,
+      defaultValue: 'Arial'
+    },
+    primaryColor: {
+      type: DataTypes.STRING,
+      defaultValue: '#000000'
     }
   }, {
     timestamps: true

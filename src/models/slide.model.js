@@ -13,16 +13,14 @@ export default (sequelize) => {
       allowNull: false
     },
     title: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: DataTypes.STRING
     },
     slideOrder: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    background: {
+      type: DataTypes.JSONB // color, gradiente o imagen
     }
   }, {
     timestamps: true
