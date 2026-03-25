@@ -17,15 +17,16 @@ export class PresentationController {
       })
 
       const result = await parser.getText()
-      const pdfText = result.text
-      const cleanText = pdfText.trim()
 
-      // Validación REAL de contenido
-      if (!cleanText || cleanText.length < 50 || cleanText.split(/\s+/).length < 10) {
+      const pdfText = result.text || result.textVal
+
+      if (!pdfText || typeof pdfText !== 'string') {
         return res.status(400).json({
-          error: 'El PDF no contiene texto suficiente o es un documento escaneado'
+          error: 'No se pudo extraer texto del PDF (puede ser escaneado o inválido)'
         })
       }
+
+      const cleanText = pdfText.trim()
 
       // Guardar en RAM (lo importante para tu app)
       const presentationText = cleanText
