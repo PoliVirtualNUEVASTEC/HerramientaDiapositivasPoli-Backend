@@ -10,8 +10,18 @@ import { presentationRoutes } from './routes/presentation.routes.js'
 export const app = express()
 app.use(express.json())
 app.use(cookieParser())
+
+const origins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean)
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true)
+    if (origins.includes('*') || origins.includes(origin)) return callback(null, true)
+    callback(new Error('CORS not allowed by origin'))
+  },
   credentials: true
 }))
 

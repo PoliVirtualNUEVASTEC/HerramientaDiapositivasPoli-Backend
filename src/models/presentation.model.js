@@ -21,14 +21,6 @@ export default (sequelize) => {
     },
     theme: {
       type: DataTypes.JSONB
-    },
-    fontFamily: {
-      type: DataTypes.STRING,
-      defaultValue: 'Arial'
-    },
-    primaryColor: {
-      type: DataTypes.STRING,
-      defaultValue: '#000000'
     }
   }, {
     timestamps: true
