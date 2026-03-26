@@ -1,5 +1,6 @@
 import { PDFParse } from 'pdf-parse'
 import { getPresentationById, savePresentation, getPresentations } from '../services/presentation.service.js'
+import { Presentation } from '../models/relations.js'
 
 const data = {
   title: 'Introducción a la Inteligencia Artificial',
@@ -268,6 +269,20 @@ export class PresentationController {
       res.status(404).json({
         error: error.message
       })
+    }
+  }
+
+  async deletePresentation (req, res) {
+    try {
+      const { id } = req.params
+      const presentation = await Presentation.findByPk(id)
+      if (!presentation) {
+        return res.status(404).json({ error: 'Presentation not found' })
+      }
+      await presentation.destroy()
+      return res.status(204).send()
+    } catch (error) {
+      return res.status(500).json({ error: 'Failed to delete presentation' })
     }
   }
 }

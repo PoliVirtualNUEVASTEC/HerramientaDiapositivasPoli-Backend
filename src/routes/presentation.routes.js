@@ -11,3 +11,4 @@ presentationRoutes.post('/pdf', authMiddleware, pdfMiddleware, presentationContr
 presentationRoutes.post('/text', authMiddleware, textMiddleware, presentationController.createPresentationFromText)
 presentationRoutes.get('/:id', authMiddleware, presentationController.getPresentation)
 presentationRoutes.get('/', authMiddleware, presentationController.getPresentations)
+presentationRoutes.delete('/:id', authMiddleware, presentationController.deletePresentation)
