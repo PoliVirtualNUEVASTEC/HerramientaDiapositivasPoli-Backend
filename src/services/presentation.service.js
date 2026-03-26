@@ -107,3 +107,18 @@ export async function getPresentationById (presentationId) {
 
   return formatted
 }
+
+export async function getPresentations (id) {
+  const presentations = await Presentation.findAll({
+    where: {
+      userId: id
+    },
+    attributes: ['id', 'title', 'description', 'createdAt']
+  })
+
+  if (!presentations) {
+    throw new Error('presentaciones no encontradas')
+  }
+
+  return presentations
+}

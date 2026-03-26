@@ -1,5 +1,5 @@
 import { PDFParse } from 'pdf-parse'
-import { getPresentationById, savePresentation } from '../services/presentation.service.js'
+import { getPresentationById, savePresentation, getPresentations } from '../services/presentation.service.js'
 
 const data = {
   title: 'Introducción a la Inteligencia Artificial',
@@ -195,7 +195,9 @@ export class PresentationController {
 
       res.status(201).json({
         message: 'Presentación creada correctamente',
-        presentationId: presentation.id
+        presentationId: presentation.id,
+        title: presentation.title,
+        createdAt: presentation.createdAt
       })
     } catch (error) {
       console.error('Error creating presentation from PDF:', error)
@@ -228,7 +230,9 @@ export class PresentationController {
 
       res.status(201).json({
         message: 'Presentación creada correctamente',
-        presentationId: presentation.id
+        presentationId: presentation.id,
+        title: presentation.title,
+        createdAt: presentation.createdAt
       })
     } catch (error) {
       console.error('Error creating presentation from text:', error)
@@ -247,8 +251,20 @@ export class PresentationController {
 
       res.json(presentation)
     } catch (error) {
-      console.error(error)
+      res.status(404).json({
+        error: error.message
+      })
+    }
+  }
 
+  async getPresentations (req, res) {
+    try {
+      const id = req.user.id
+
+      const presentations = await getPresentations(id)
+
+      res.json(presentations)
+    } catch (error) {
       res.status(404).json({
         error: error.message
       })
