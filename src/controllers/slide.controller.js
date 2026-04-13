@@ -98,22 +98,37 @@ export class SlideController {
   async deleteSlide (req, res) {
     try {
       const { id } = req.params
+      console.log('=== DELETE SLIDE DEBUG ===')
+      console.log('ID recibido (tipo):', id, typeof id)
+      console.log('ID como número:', Number(id))
+
       const slide = await Slide.findByPk(id)
+      console.log('Resultado de findByPk:', slide)
+      console.log('Slide encontrado:', slide ? `ID: ${slide.id}, Title: ${slide.title}` : 'NO ENCONTRADO')
+
       if (!slide) {
+        console.log('Retornando 404 - Slide not found')
         return res.status(404).json({ error: 'Slide not found' })
       }
 
       const presentationId = slide.presentationId
       const deletedOrder = slide.slideOrder
+      console.log('Datos del slide a eliminar:', { id: slide.id, presentationId, deletedOrder })
 
       await slide.destroy()
+      console.log('Slide destruido exitosamente')
 
       // Decrementar el orden de los slides con orden > deletedOrder
-      await Slide.decrement('slideOrder', { where: { presentationId, slideOrder: { [Op.gt]: deletedOrder } } })
+      console.log('Decrementando ordenes >', deletedOrder, 'para presentationId:', presentationId)
+      const updateResult = await Slide.decrement('slideOrder', { where: { presentationId, slideOrder: { [Op.gt]: deletedOrder } } })
+      console.log('Resultado del decrement:', updateResult)
 
+      console.log('=== DELETE COMPLETADO ===')
       return res.status(204).send()
     } catch (error) {
-      console.error('Error deleting slide:', error)
+      console.error('=== ERROR EN DELETE ===')
+      console.error('Error completo:', error)
+      console.error('Stack:', error.stack)
       return res.status(500).json({ error: 'Failed to delete slide' })
     }
   }
