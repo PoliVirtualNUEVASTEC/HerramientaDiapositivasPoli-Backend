@@ -6,7 +6,11 @@ import 'dotenv/config'
 import { userRoutes } from './routes/user.routes.js'
 import { loginRoutes } from './routes/login.routes.js'
 import { presentationRoutes } from './routes/presentation.routes.js'
+<<<<<<< HEAD
 import { slideRoutes } from './routes/slide.routes.js'
+=======
+import { slideElementsRoutes } from './routes/slideElements.routes.js'
+>>>>>>> 42fe63e407ae71e254e954dcbe9af6cb370e0487
 
 export const app = express()
 app.use(express.json())
@@ -29,4 +33,8 @@ app.use(cors({
 app.use('/api/users/', userRoutes)
 app.use('/api/auth/', loginRoutes)
 app.use('/api/presentations', presentationRoutes)
+<<<<<<< HEAD
 app.use('/api/slides', slideRoutes)
+=======
+app.use('/api/slide-elements', slideElementsRoutes)
+>>>>>>> 42fe63e407ae71e254e954dcbe9af6cb370e0487
