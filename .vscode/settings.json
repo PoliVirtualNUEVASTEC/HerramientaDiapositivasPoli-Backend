@@ -8,5 +8,6 @@
         "javascript",
         "javascriptreact"
     ],
-    "eslint.format.enable": true
+    "eslint.format.enable": true,
+    "workbench.colorTheme": "Night Owl"
 }
