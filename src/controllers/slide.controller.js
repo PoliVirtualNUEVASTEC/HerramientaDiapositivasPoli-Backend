@@ -1,4 +1,4 @@
-import { Slide } from '../models/relations.js'
+import { Slide, SlideElement } from '../models/relations.js'
 import { Op } from 'sequelize'
 
 export class SlideController {
@@ -40,6 +40,7 @@ export class SlideController {
 
       const slides = await Slide.findAll({
         where: { presentationId },
+        include: [{ model: SlideElement, as: 'SlideElements' }],
         order: [['slideOrder', 'ASC']]
       })
       return res.json(slides)
@@ -99,37 +100,80 @@ export class SlideController {
     try {
       const { id } = req.params
       console.log('=== DELETE SLIDE DEBUG ===')
-      console.log('ID recibido (tipo):', id, typeof id)
-      console.log('ID como número:', Number(id))
-
       const slide = await Slide.findByPk(id)
-      console.log('Resultado de findByPk:', slide)
-      console.log('Slide encontrado:', slide ? `ID: ${slide.id}, Title: ${slide.title}` : 'NO ENCONTRADO')
 
       if (!slide) {
-        console.log('Retornando 404 - Slide not found')
         return res.status(404).json({ error: 'Slide not found' })
       }
 
       const presentationId = slide.presentationId
       const deletedOrder = slide.slideOrder
-      console.log('Datos del slide a eliminar:', { id: slide.id, presentationId, deletedOrder })
 
       await slide.destroy()
-      console.log('Slide destruido exitosamente')
 
       // Decrementar el orden de los slides con orden > deletedOrder
-      console.log('Decrementando ordenes >', deletedOrder, 'para presentationId:', presentationId)
-      const updateResult = await Slide.decrement('slideOrder', { where: { presentationId, slideOrder: { [Op.gt]: deletedOrder } } })
-      console.log('Resultado del decrement:', updateResult)
+      await Slide.decrement('slideOrder', { where: { presentationId, slideOrder: { [Op.gt]: deletedOrder } } })
 
-      console.log('=== DELETE COMPLETADO ===')
       return res.status(204).send()
     } catch (error) {
-      console.error('=== ERROR EN DELETE ===')
-      console.error('Error completo:', error)
-      console.error('Stack:', error.stack)
+      console.error('=== ERROR EN DELETE ===', error)
       return res.status(500).json({ error: 'Failed to delete slide' })
+    }
+  }
+
+  async duplicateSlide (req, res) {
+    try {
+      const { id } = req.params
+
+      // 1. Buscamos el original incluyendo sus elementos con el ALIAS correcto
+      const original = await Slide.findByPk(id, {
+        include: [{ model: SlideElement, as: 'SlideElements' }]
+      })
+
+      if (!original) return res.status(404).json({ error: 'Slide not found' })
+
+      const { presentationId, title, background } = original
+      const newOrder = original.slideOrder + 1
+
+      // 2. Desplazar las siguientes
+      await Slide.increment('slideOrder', {
+        where: { presentationId, slideOrder: { [Op.gte]: newOrder } }
+      })
+
+      // 3. Crear la nueva diapositiva (Asegurando background)
+      const duplicatedSlide = await Slide.create({
+        presentationId,
+        title: `${title} (copia)`,
+        slideOrder: newOrder,
+        background // IMPORTANTE para que no salga en blanco
+      })
+
+      // 4. CLONAR ELEMENTOS: Usamos el alias SlideElements que viene del include
+      if (original.SlideElements && original.SlideElements.length > 0) {
+        const clonedElements = original.SlideElements.map(el => ({
+          type: el.type,
+          content: el.content,
+          positionX: el.positionX,
+          positionY: el.positionY,
+          width: el.width,
+          height: el.height,
+          styles: el.styles,
+          order: el.order,
+          slideId: duplicatedSlide.id // Vinculación al nuevo slide
+        }))
+
+        await SlideElement.bulkCreate(clonedElements)
+      }
+
+      // 5. Devolver el slide completo con sus nuevos elementos
+      const finalResult = await Slide.findByPk(duplicatedSlide.id, {
+        include: [{ model: SlideElement, as: 'SlideElements' }]
+      })
+
+      return res.status(201).json(finalResult)
+    } catch (error) {
+      console.error('Error al duplicar diapositiva:', error)
+      return res.status(500).json({ error: 'Error al duplicar la diapositiva y sus elementos' })
     }
   }
 }
