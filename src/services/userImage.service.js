@@ -22,9 +22,21 @@ export class UserImageValidationError extends Error {
   }
 }
 
+export class DuplicateUserImageError extends Error {
+  constructor (existingImage) {
+    super('Esta imagen ya fue subida por el usuario')
+    this.name = 'DuplicateUserImageError'
+    this.existingImage = existingImage
+  }
+}
+
 const buildUserImagePath = (userId) => {
   const randomSuffix = crypto.randomBytes(8).toString('hex')
   return `users/${userId}/${Date.now()}-${randomSuffix}.webp`
+}
+
+const buildContentHash = (buffer) => {
+  return crypto.createHash('sha256').update(buffer).digest('hex')
 }
 
 export const optimizeImageBuffer = async (buffer) => {
@@ -124,6 +136,19 @@ export const enforceUserImageLimit = async (userId) => {
 
 export const uploadUserImage = async ({ userId, fileBuffer }) => {
   const optimizedBuffer = await optimizeImageBuffer(fileBuffer)
+  const contentHash = buildContentHash(optimizedBuffer)
+  const existingImage = await UserImage.findOne({
+    where: {
+      userId,
+      contentHash
+    }
+  })
+
+  if (existingImage) {
+    await touchUserImageAccess(existingImage)
+    throw new DuplicateUserImageError(existingImage)
+  }
+
   const storagePath = buildUserImagePath(userId)
 
   const { error: uploadError } = await supabase.storage
@@ -147,6 +172,7 @@ export const uploadUserImage = async ({ userId, fileBuffer }) => {
       userId,
       url: data.publicUrl,
       path: storagePath,
+      contentHash,
       lastAccessedAt: new Date()
     })
 
@@ -163,6 +189,10 @@ export const uploadUserImage = async ({ userId, fileBuffer }) => {
 export const touchUserImageAccess = async (userImage) => {
   await userImage.update({ lastAccessedAt: new Date() })
   return userImage
+}
+
+export const deleteUserImage = async (userImage) => {
+  return deleteUserImages([userImage])
 }
 
 export const runUserImageMaintenance = async () => {

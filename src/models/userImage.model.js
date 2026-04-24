@@ -20,6 +20,10 @@ export default (sequelize) => {
       allowNull: false,
       unique: true
     },
+    contentHash: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     lastAccessedAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -30,7 +34,11 @@ export default (sequelize) => {
     timestamps: true,
     indexes: [
       { fields: ['userId'] },
-      { fields: ['userId', 'lastAccessedAt'] }
+      { fields: ['userId', 'lastAccessedAt'] },
+      {
+        unique: true,
+        fields: ['userId', 'contentHash']
+      }
     ]
   })
 

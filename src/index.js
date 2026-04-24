@@ -7,7 +7,7 @@ try {
   await sequelize.authenticate()
   console.log('Conexion a Supabase exitosa')
 
-  await UserImage.sync()
+  await UserImage.sync({ alter: true })
   await runUserImageMaintenance()
   startUserImageMaintenance()
 

@@ -1,6 +1,8 @@
 import { UserImage } from '../models/relations.js'
 import {
   cleanupExpiredUserImages,
+  deleteUserImage,
+  DuplicateUserImageError,
   enforceUserImageLimit,
   UserImageValidationError,
   touchUserImageAccess,
@@ -36,6 +38,13 @@ export class UserImageController {
       })
     } catch (error) {
       console.error('Error uploading image:', error)
+      if (error instanceof DuplicateUserImageError) {
+        return res.status(409).json({
+          error: error.message,
+          image: error.existingImage
+        })
+      }
+
       if (error instanceof UserImageValidationError) {
         return res.status(400).json({ error: error.message })
       }
@@ -72,6 +81,16 @@ export class UserImageController {
     } catch (error) {
       console.error('Error updating image access date:', error)
       return res.status(500).json({ error: 'Error al actualizar el acceso de la imagen' })
+    }
+  }
+
+  async deleteImage (req, res) {
+    try {
+      await deleteUserImage(req.userImage)
+      return res.status(204).send()
+    } catch (error) {
+      console.error('Error deleting user image:', error)
+      return res.status(500).json({ error: 'Error al eliminar la imagen' })
     }
   }
 }
