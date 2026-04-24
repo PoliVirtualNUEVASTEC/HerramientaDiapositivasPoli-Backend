@@ -18,7 +18,7 @@ export function validateSlideElementPayload ({ type, content }) {
   switch (type) {
     case 'text':
     case 'title':
-      if (!content.text || typeof content.text !== 'string') {
+      if (typeof content.text !== 'string') { // !content.text ||
         return {
           valid: false,
           message: 'Para type "text" o "title", content debe tener la forma: { text: "..." }'

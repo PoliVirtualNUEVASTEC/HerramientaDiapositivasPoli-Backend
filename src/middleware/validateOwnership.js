@@ -1,4 +1,4 @@
-import { Presentation, Slide, SlideElement } from '../models/relations.js'
+import { Presentation, Slide, SlideElement, UserImage } from '../models/relations.js'
 
 export async function validateSlideOwnership (req, res, next) {
   const slideId = req.params.slideId || req.body.slideId
@@ -49,5 +49,21 @@ export async function validateSlideElementOwnership (req, res, next) {
   req.slideElement = slideElement
   req.slide = slide
   req.presentation = presentation
+  next()
+}
+
+export async function validateUserImageOwnership (req, res, next) {
+  const { id } = req.params
+  const userImage = await UserImage.findByPk(id)
+
+  if (!userImage) {
+    return res.status(404).json({ error: 'Imagen no encontrada' })
+  }
+
+  if (userImage.userId !== req.user.id) {
+    return res.status(403).json({ error: 'No tienes permiso para modificar este recurso' })
+  }
+
+  req.userImage = userImage
   next()
 }
