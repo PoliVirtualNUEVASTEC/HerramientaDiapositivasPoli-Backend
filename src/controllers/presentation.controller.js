@@ -1,10 +1,11 @@
 import { PDFParse } from 'pdf-parse'
-import { getPresentationById, savePresentation, getPresentations } from '../services/presentation.service.js'
+import { getPresentationById, savePresentation, getPresentations, generatePresentation } from '../services/presentation.service.js'
 import { Presentation } from '../models/relations.js'
-import { createRequire } from 'module'
+// import { createRequire } from 'module'
 
-const require = createRequire(import.meta.url)
-const presentationTemplate = require('../slides_templates/presentationTemplate.json')
+// const require = createRequire(import.meta.url)
+// const presentationTemplate = require('../slides_templates/presentationTemplate.json')
+// const presentationTemplate = require('../slides_templates/ia.json')
 
 export class PresentationController {
   async createPresentationFromPDF (req, res) {
@@ -40,14 +41,17 @@ export class PresentationController {
       console.log('Preview del PDF:')
       console.log(presentationText.substring(0, 300))
 
-      const presentation = await savePresentation(presentationTemplate, userId)
+      const presentationAI = await generatePresentation({ text: presentationText, title: '', numberOfSlides: 6 })
+
+      const presentation = await savePresentation(presentationAI, userId)
       // console.log(presentation)
 
       res.status(201).json({
         message: 'Presentación creada correctamente',
         presentationId: presentation.id,
         title: presentation.title,
-        createdAt: presentation.createdAt
+        createdAt: presentation.createdAt,
+        presentationAI
       })
     } catch (error) {
       console.error('Error creating presentation from PDF:', error)
@@ -75,7 +79,9 @@ export class PresentationController {
       console.log('Texto recibido:')
       console.log(presentationText.substring(0, 300))
 
-      const presentation = await savePresentation(presentationTemplate, userId)
+      const presentationAI = await generatePresentation({ text: presentationText, title: '', numberOfSlides: 6 })
+
+      const presentation = await savePresentation(presentationAI, userId)
       // console.log(presentation)
 
       res.status(201).json({

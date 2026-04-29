@@ -2,6 +2,22 @@
 
 import { sequelize } from '../db/database.js'
 import { Presentation, SlideElement, Slide } from '../models/relations.js'
+import {
+  generatePresentationWithAI
+} from './openai.service.js'
+
+import {
+  searchPexelsImage
+} from './pexels.service.js'
+
+const TEMPLATE_BACKGROUNDS = {
+  cover:
+    'https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/title_slide.jpg',
+  content:
+    'https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/slide1.jpg',
+  end:
+    'https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/end_slide.jpg'
+}
 
 export async function savePresentation (data, userId) {
   const transaction = await sequelize.transaction()
@@ -121,4 +137,78 @@ export async function getPresentations (id) {
   }
 
   return presentations
+}
+
+function applyFixedBackgrounds (presentation) {
+  const totalSlides = presentation.slides.length
+
+  presentation.slides = presentation.slides.map((slide, index) => {
+    let backgroundUrl = TEMPLATE_BACKGROUNDS.content
+
+    if (index === 0) {
+      backgroundUrl = TEMPLATE_BACKGROUNDS.cover
+    }
+
+    if (index === totalSlides - 1) {
+      backgroundUrl = TEMPLATE_BACKGROUNDS.end
+    }
+
+    return {
+      ...slide,
+      background: {
+        type: 'image',
+        url: backgroundUrl
+      }
+    }
+  })
+
+  return presentation
+}
+
+async function resolvePresentationImages (presentation) {
+  for (const slide of presentation.slides) {
+    if (!slide.elements) continue
+
+    for (const element of slide.elements) {
+      if (element.type !== 'image') continue
+
+      const imageRequest = element.content && element.content.image
+
+      if (!imageRequest) continue
+
+      try {
+        const resolvedImage = await searchPexelsImage(imageRequest)
+
+        element.content = {
+          ...element.content,
+          resolvedImage
+        }
+      } catch (error) {
+        console.error('Error resolviendo imagen:', error.message)
+
+        element.content = {
+          ...element.content,
+          resolvedImage: null
+        }
+      }
+    }
+  }
+
+  return presentation
+}
+
+export async function generatePresentation ({ text, title, numberOfSlides }) {
+  const generatedPresentation = await generatePresentationWithAI({
+    text,
+    title,
+    numberOfSlides
+  })
+
+  const presentationWithBackgrounds = applyFixedBackgrounds(generatedPresentation)
+
+  const finalPresentation = await resolvePresentationImages(
+    presentationWithBackgrounds
+  )
+
+  return finalPresentation
 }

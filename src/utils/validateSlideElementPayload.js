@@ -26,7 +26,7 @@ export function validateSlideElementPayload ({ type, content }) {
       }
       break
     case 'image':
-      if (!content.url || typeof content.url !== 'string') {
+      if (!content.resolvedImage.url || typeof content.resolvedImage.url !== 'string') {
         return {
           valid: false,
           message: 'Para type "image", content debe tener la forma: { url: "https://..." }'

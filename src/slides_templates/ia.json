@@ -1,0 +1,386 @@
+{
+    "title": "Propuesta de Trabajo de Grado: Aplicativo Web para Generación Automática de Presentaciones con IA",
+    "description": "Desarrollo de un aplicativo web institucional para generar presentaciones académicas automáticamente con inteligencia artificial, optimizando tiempo y facilitando la creación de contenidos en PCJIC.",
+    "theme": {
+        "background": "",
+        "fontFamily": "Arial, sans-serif",
+        "primaryColor": "#2E86C1"
+    },
+    "slides": [
+        {
+            "title": "Portada",
+            "slideOrder": 1,
+            "elements": [
+                {
+                    "type": "title",
+                    "content": {
+                        "text": "Desarrollo de un Aplicativo Web Institucional para Generación Automática de Presentaciones con IA en PCJIC.",
+                        "items": null,
+                        "image": null
+                    },
+                    "positionX": 50,
+                    "positionY": 50,
+                    "width": 860,
+                    "height": 100,
+                    "styles": {
+                        "fontSize": 28,
+                        "fontWeight": "bold",
+                        "color": "#1A237E",
+                        "textAlign": "center",
+                        "lineHeight": 1.2,
+                        "borderRadius": null
+                    },
+                    "order": 1
+                },
+                {
+                    "type": "text",
+                    "content": {
+                        "text": "Autores: Juan Jose Estrada Velez y Miguel Angel Mejia Suarez\nAsesor: Andrés Felipe Mamián Jiménez",
+                        "items": null,
+                        "image": null
+                    },
+                    "positionX": 50,
+                    "positionY": 170,
+                    "width": 860,
+                    "height": 80,
+                    "styles": {
+                        "fontSize": 16,
+                        "fontWeight": "normal",
+                        "color": "#34495E",
+                        "textAlign": "center",
+                        "lineHeight": 1.3,
+                        "borderRadius": null
+                    },
+                    "order": 2
+                },
+                {
+                    "type": "image",
+                    "content": {
+                        "text": null,
+                        "items": null,
+                        "image": {
+                            "query": "web application interface artificial intelligence",
+                            "style": "photo",
+                            "orientation": "horizontal"
+                        },
+                        "resolvedImage": {
+                            "url": "https://images.pexels.com/photos/16027824/pexels-photo-16027824.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+                            "alt": "Close-up of a computer screen displaying ChatGPT interface in a dark setting.",
+                            "photographer": "Matheus Bertelli",
+                            "photographerUrl": "https://www.pexels.com/@bertellifotografia",
+                            "pexelsUrl": "https://www.pexels.com/photo/chat-gpt-welcome-screen-on-computer-16027824/"
+                        }
+                    },
+                    "positionX": 380,
+                    "positionY": 270,
+                    "width": 200,
+                    "height": 120,
+                    "styles": {
+                        "fontSize": null,
+                        "fontWeight": null,
+                        "color": null,
+                        "textAlign": null,
+                        "lineHeight": null,
+                        "borderRadius": 8
+                    },
+                    "order": 3
+                }
+            ],
+            "background": {
+                "type": "image",
+                "url": "https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/title_slide.jpg"
+            }
+        },
+        {
+            "title": "Planteamiento del Problema",
+            "slideOrder": 2,
+            "elements": [
+                {
+                    "type": "title",
+                    "content": {
+                        "text": "Planteamiento del Problema",
+                        "items": null,
+                        "image": null
+                    },
+                    "positionX": 50,
+                    "positionY": 40,
+                    "width": 860,
+                    "height": 50,
+                    "styles": {
+                        "fontSize": 24,
+                        "fontWeight": "bold",
+                        "color": "#1B4F72",
+                        "textAlign": "left",
+                        "lineHeight": 1.2,
+                        "borderRadius": null
+                    },
+                    "order": 1
+                },
+                {
+                    "type": "list",
+                    "content": {
+                        "text": null,
+                        "items": [
+                            "PCJIC cuenta con 13,000 usuarios que requieren crear presentaciones académicas.",
+                            "Elaborar presentaciones demanda mucho tiempo y esfuerzo cognitivo.",
+                            "Herramientas IA comerciales limitan acceso por suscripciones pagas.",
+                            "Existe brecha tecnológica y falta solución institucional adaptada.",
+                            "Se necesita una plataforma IA institucional para generación automática.",
+                            "Objetivo: Optimizar tiempo y facilitar creación con IA en PCJIC."
+                        ],
+                        "image": null
+                    },
+                    "positionX": 60,
+                    "positionY": 110,
+                    "width": 840,
+                    "height": 320,
+                    "styles": {
+                        "fontSize": 18,
+                        "fontWeight": "normal",
+                        "color": "#2C3E50",
+                        "textAlign": "left",
+                        "lineHeight": 1.4,
+                        "borderRadius": null
+                    },
+                    "order": 2
+                }
+            ],
+            "background": {
+                "type": "image",
+                "url": "https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/slide1.jpg"
+            }
+        },
+        {
+            "title": "Justificación",
+            "slideOrder": 3,
+            "elements": [
+                {
+                    "type": "title",
+                    "content": {
+                        "text": "Justificación",
+                        "items": null,
+                        "image": null
+                    },
+                    "positionX": 50,
+                    "positionY": 40,
+                    "width": 860,
+                    "height": 50,
+                    "styles": {
+                        "fontSize": 24,
+                        "fontWeight": "bold",
+                        "color": "#1B4F72",
+                        "textAlign": "left",
+                        "lineHeight": 1.2,
+                        "borderRadius": null
+                    },
+                    "order": 1
+                },
+                {
+                    "type": "list",
+                    "content": {
+                        "text": null,
+                        "items": [
+                            "IA mejora productividad y reduce carga cognitiva en universidades.",
+                            "Solución institucional garantiza acceso gratuito y equitativo.",
+                            "Permite integración pedagógica y coherencia institucional.",
+                            "Contribuye a desarrollo de competencias digitales éticas.",
+                            "Impacto: mejora académica, operativo e innovación institucional."
+                        ],
+                        "image": null
+                    },
+                    "positionX": 60,
+                    "positionY": 110,
+                    "width": 840,
+                    "height": 320,
+                    "styles": {
+                        "fontSize": 18,
+                        "fontWeight": "normal",
+                        "color": "#2C3E50",
+                        "textAlign": "left",
+                        "lineHeight": 1.4,
+                        "borderRadius": null
+                    },
+                    "order": 2
+                }
+            ],
+            "background": {
+                "type": "image",
+                "url": "https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/slide1.jpg"
+            }
+        },
+        {
+            "title": "Alcance del Proyecto",
+            "slideOrder": 4,
+            "elements": [
+                {
+                    "type": "title",
+                    "content": {
+                        "text": "Alcance del Proyecto",
+                        "items": null,
+                        "image": null
+                    },
+                    "positionX": 50,
+                    "positionY": 40,
+                    "width": 860,
+                    "height": 50,
+                    "styles": {
+                        "fontSize": 24,
+                        "fontWeight": "bold",
+                        "color": "#1B4F72",
+                        "textAlign": "left",
+                        "lineHeight": 1.2,
+                        "borderRadius": null
+                    },
+                    "order": 1
+                },
+                {
+                    "type": "list",
+                    "content": {
+                        "text": null,
+                        "items": [
+                            "Diseño, desarrollo e implementación de un MVP de aplicativo web IA.",
+                            "MVP genera presentaciones desde texto o PDF con edición básica.",
+                            "Incluye exportación a PDF y PowerPoint.",
+                            "No incluye editor avanzado, colaboración ni IA propia.",
+                            "Base para futuras mejoras y escalabilidad institucional."
+                        ],
+                        "image": null
+                    },
+                    "positionX": 60,
+                    "positionY": 110,
+                    "width": 840,
+                    "height": 320,
+                    "styles": {
+                        "fontSize": 18,
+                        "fontWeight": "normal",
+                        "color": "#2C3E50",
+                        "textAlign": "left",
+                        "lineHeight": 1.4,
+                        "borderRadius": null
+                    },
+                    "order": 2
+                }
+            ],
+            "background": {
+                "type": "image",
+                "url": "https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/slide1.jpg"
+            }
+        },
+        {
+            "title": "Objetivos",
+            "slideOrder": 5,
+            "elements": [
+                {
+                    "type": "title",
+                    "content": {
+                        "text": "Objetivo General y Específicos",
+                        "items": null,
+                        "image": null
+                    },
+                    "positionX": 50,
+                    "positionY": 40,
+                    "width": 860,
+                    "height": 50,
+                    "styles": {
+                        "fontSize": 24,
+                        "fontWeight": "bold",
+                        "color": "#1B4F72",
+                        "textAlign": "left",
+                        "lineHeight": 1.2,
+                        "borderRadius": null
+                    },
+                    "order": 1
+                },
+                {
+                    "type": "list",
+                    "content": {
+                        "text": null,
+                        "items": [
+                            "Desarrollar aplicativo web institucional con IA para generación automática de presentaciones académicas.",
+                            "Documentar requisitos y diseñar arquitectura y prototipos.",
+                            "Implementar y validar funcionalidad con usuarios de PCJIC.",
+                            "Elaborar documentación técnica y manual de usuario.",
+                            "Asegurar reducción de tiempo y estructuración eficiente."
+                        ],
+                        "image": null
+                    },
+                    "positionX": 60,
+                    "positionY": 110,
+                    "width": 840,
+                    "height": 320,
+                    "styles": {
+                        "fontSize": 18,
+                        "fontWeight": "normal",
+                        "color": "#2C3E50",
+                        "textAlign": "left",
+                        "lineHeight": 1.4,
+                        "borderRadius": null
+                    },
+                    "order": 2
+                }
+            ],
+            "background": {
+                "type": "image",
+                "url": "https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/slide1.jpg"
+            }
+        },
+        {
+            "title": "Metodología y Herramientas",
+            "slideOrder": 6,
+            "elements": [
+                {
+                    "type": "title",
+                    "content": {
+                        "text": "Metodología y Tecnologías",
+                        "items": null,
+                        "image": null
+                    },
+                    "positionX": 50,
+                    "positionY": 40,
+                    "width": 860,
+                    "height": 50,
+                    "styles": {
+                        "fontSize": 24,
+                        "fontWeight": "bold",
+                        "color": "#1B4F72",
+                        "textAlign": "left",
+                        "lineHeight": 1.2,
+                        "borderRadius": null
+                    },
+                    "order": 1
+                },
+                {
+                    "type": "list",
+                    "content": {
+                        "text": null,
+                        "items": [
+                            "Metodología ágil con enfoque Scrum adaptado a equipo pequeño.",
+                            "Fases: Análisis, desarrollo, pruebas, despliegue y documentación.",
+                            "Herramientas: ReactJS, Node.js, Express, Github, Vercel, Supabase.",
+                            "IA: Integración API GPT-4o mini / Gemini Flash para procesamiento.",
+                            "Validación continua y control de calidad durante desarrollo."
+                        ],
+                        "image": null
+                    },
+                    "positionX": 60,
+                    "positionY": 110,
+                    "width": 840,
+                    "height": 320,
+                    "styles": {
+                        "fontSize": 18,
+                        "fontWeight": "normal",
+                        "color": "#2C3E50",
+                        "textAlign": "left",
+                        "lineHeight": 1.4,
+                        "borderRadius": null
+                    },
+                    "order": 2
+                }
+            ],
+            "background": {
+                "type": "image",
+                "url": "https://qftsvgnhxcqdrcarvsiq.supabase.co/storage/v1/object/public/images/slides/end_slide.jpg"
+            }
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 import { app } from './app.js'
-import { UserImage } from './models/relations.js'
+import './models/relations.js'
 import { sequelize } from './db/database.js'
 import { runUserImageMaintenance, startUserImageMaintenance } from './services/userImage.service.js'
 
@@ -7,7 +7,7 @@ try {
   await sequelize.authenticate()
   console.log('Conexion a Supabase exitosa')
 
-  await UserImage.sync({ alter: true })
+  // await UserImage.sync({ alter: true })
   await runUserImageMaintenance()
   startUserImageMaintenance()
 
