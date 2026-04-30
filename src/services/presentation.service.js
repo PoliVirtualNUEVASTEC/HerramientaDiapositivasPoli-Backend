@@ -1,6 +1,7 @@
 // services/presentation.service.js
 
 import { sequelize } from '../db/database.js'
+import { Op, fn, col } from 'sequelize'
 import { Presentation, SlideElement, Slide } from '../models/relations.js'
 import {
   generatePresentationWithAI
@@ -132,11 +133,60 @@ export async function getPresentations (id) {
     attributes: ['id', 'title', 'description', 'createdAt']
   })
 
-  if (!presentations) {
+  if (presentations.length === 0) {
     throw new Error('presentaciones no encontradas')
   }
 
-  return presentations
+  const presentationIds = presentations.map(presentation => presentation.id)
+
+  const [slidesCountRows, slides] = await Promise.all([
+    Slide.findAll({
+      where: {
+        presentationId: {
+          [Op.in]: presentationIds
+        }
+      },
+      attributes: [
+        'presentationId',
+        [fn('COUNT', col('id')), 'slidesCount']
+      ],
+      group: ['presentationId'],
+      raw: true
+    }),
+    Slide.findAll({
+      where: {
+        presentationId: {
+          [Op.in]: presentationIds
+        }
+      },
+      attributes: ['id', 'presentationId', 'title', 'slideOrder', 'background', 'createdAt'],
+      order: [['presentationId', 'ASC'], ['slideOrder', 'ASC']]
+    })
+  ])
+
+  const slidesCountByPresentationId = new Map(
+    slidesCountRows.map(row => [row.presentationId, Number(row.slidesCount)])
+  )
+
+  const firstSlideByPresentationId = new Map()
+
+  for (const slide of slides) {
+    if (!firstSlideByPresentationId.has(slide.presentationId)) {
+      firstSlideByPresentationId.set(slide.presentationId, {
+        id: slide.id,
+        title: slide.title,
+        slideOrder: slide.slideOrder,
+        background: slide.background,
+        createdAt: slide.createdAt
+      })
+    }
+  }
+
+  return presentations.map(presentation => ({
+    ...presentation.get({ plain: true }),
+    slidesCount: slidesCountByPresentationId.get(presentation.id) ?? 0,
+    firstSlide: firstSlideByPresentationId.get(presentation.id) ?? null
+  }))
 }
 
 function applyFixedBackgrounds (presentation) {
