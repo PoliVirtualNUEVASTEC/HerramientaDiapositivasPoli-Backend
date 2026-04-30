@@ -204,6 +204,13 @@ export async function generatePresentation ({ text, title, numberOfSlides }) {
     numberOfSlides
   })
 
+  const finalslide = {
+    title: 'Cierre Presentación',
+    slideOrder: generatedPresentation.slides.length + 1
+  }
+
+  generatedPresentation.slides.push(finalslide)
+
   const presentationWithBackgrounds = applyFixedBackgrounds(generatedPresentation)
 
   const finalPresentation = await resolvePresentationImages(

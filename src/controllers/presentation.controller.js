@@ -11,6 +11,7 @@ export class PresentationController {
   async createPresentationFromPDF (req, res) {
     try {
       const userId = req.user.id
+      const numberOfSlides = req.body.numberOfSlides
 
       if (!req.file) {
         return res.status(400).json({
@@ -34,24 +35,21 @@ export class PresentationController {
 
       const cleanText = pdfText.trim()
 
-      // Guardar en RAM (lo importante para tu app)
       const presentationText = cleanText
 
       // Debug útil (solo preview)
       console.log('Preview del PDF:')
       console.log(presentationText.substring(0, 300))
 
-      const presentationAI = await generatePresentation({ text: presentationText, title: '', numberOfSlides: 6 })
+      const presentationAI = await generatePresentation({ text: presentationText, title: '', numberOfSlides })
 
       const presentation = await savePresentation(presentationAI, userId)
-      // console.log(presentation)
 
       res.status(201).json({
         message: 'Presentación creada correctamente',
         presentationId: presentation.id,
         title: presentation.title,
-        createdAt: presentation.createdAt,
-        presentationAI
+        createdAt: presentation.createdAt
       })
     } catch (error) {
       console.error('Error creating presentation from PDF:', error)
@@ -64,7 +62,7 @@ export class PresentationController {
 
   async createPresentationFromText (req, res) {
     try {
-      const { text } = req.body
+      const { text, numberOfSlides } = req.body
       const userId = req.user.id
 
       if (!text || text.trim().length === 0) {
@@ -79,7 +77,7 @@ export class PresentationController {
       console.log('Texto recibido:')
       console.log(presentationText.substring(0, 300))
 
-      const presentationAI = await generatePresentation({ text: presentationText, title: '', numberOfSlides: 6 })
+      const presentationAI = await generatePresentation({ text: presentationText, title: '', numberOfSlides })
 
       const presentation = await savePresentation(presentationAI, userId)
       // console.log(presentation)
