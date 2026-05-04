@@ -13,6 +13,7 @@ import { userImageRoutes } from './routes/userImage.routes.js'
 export const app = express()
 app.use(express.json())
 app.use(cookieParser())
+app.set('trust proxy', 1)
 
 const origins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
