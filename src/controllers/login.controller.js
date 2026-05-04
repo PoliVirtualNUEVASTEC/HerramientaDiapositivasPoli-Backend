@@ -4,8 +4,7 @@ import { User, PasswordResetToken } from '../models/relations.js'
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt.js'
 import { Op } from 'sequelize'
 import crypto from 'crypto'
-
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
 export class LoginController {
   async login (req, res) {
@@ -162,16 +161,18 @@ export class LoginController {
       const frontendUrl = process.env.FRONTEND_URL
       const resetLink = `${frontendUrl}/reset-password?token=${token}`
 
-      await transporter.sendMail({
-        from: '"PresentAI" <no-reply@presentai.com>',
+      const resend = new Resend(process.env.RESEND_API_KEY)
+
+      await resend.emails.send({
+        from: 'onboarding@resend.dev',
         to: user.email,
         subject: 'Recuperar contraseña',
         html: `
-      <h2>Recuperación de contraseña</h2>
-      <p>Haz click en el siguiente enlace:</p>
-      <a href="${resetLink}">Restablecer contraseña</a>
-      <p>Este enlace expira en 30 minutos.</p>
-    `
+    <h2>Recuperación de contraseña</h2>
+    <p>Haz click en el siguiente enlace:</p>
+    <a href="${resetLink}">Restablecer contraseña</a>
+    <p>Este enlace expira en 30 minutos.</p>
+  `
       })
 
       res.json({ message: 'Correo enviado' })
@@ -222,11 +223,3 @@ export class LoginController {
     res.json({ message: 'Contraseña actualizada' })
   }
 }
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASS
-  }
-})
