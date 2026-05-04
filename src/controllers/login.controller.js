@@ -42,14 +42,14 @@ export class LoginController {
     // })
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: true,
       maxAge: 15 * 60 * 1000
     })
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
@@ -88,7 +88,7 @@ export class LoginController {
       // })
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: 'none',
         secure: true,
         maxAge: 15 * 60 * 1000
       })
