@@ -177,7 +177,7 @@ export class LoginController {
       res.json({ message: 'Correo enviado' })
     } catch (error) {
       console.error('Error fetching user:', error)
-      return res.status(500).json({ error: 'Failed to fetch user' })
+      return res.status(500).json({ error: 'Failed to fetch user', err: error })
     }
   }
 
