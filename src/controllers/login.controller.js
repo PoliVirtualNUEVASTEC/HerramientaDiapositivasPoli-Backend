@@ -140,40 +140,45 @@ export class LoginController {
   async forgotPassword (req, res) {
     const { email } = req.body
 
-    const user = await User.findOne({ where: { email } })
+    try {
+      const user = await User.findOne({ where: { email } })
 
-    if (!user) {
-      return res.json({ message: 'Si el correo existe, se enviará un link' })
+      if (!user) {
+        return res.json({ message: 'Si el correo existe, se enviará un link' })
+      }
+
+      await PasswordResetToken.destroy({
+        where: { userId: user.id }
+      })
+
+      const token = crypto.randomBytes(32).toString('hex')
+
+      await PasswordResetToken.create({
+        userId: user.id,
+        token,
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000)
+      })
+
+      const frontendUrl = process.env.FRONTEND_URL
+      const resetLink = `${frontendUrl}/reset-password?token=${token}`
+
+      await transporter.sendMail({
+        from: '"PresentAI" <no-reply@presentai.com>',
+        to: user.email,
+        subject: 'Recuperar contraseña',
+        html: `
+      <h2>Recuperación de contraseña</h2>
+      <p>Haz click en el siguiente enlace:</p>
+      <a href="${resetLink}">Restablecer contraseña</a>
+      <p>Este enlace expira en 30 minutos.</p>
+    `
+      })
+
+      res.json({ message: 'Correo enviado' })
+    } catch (error) {
+      console.error('Error fetching user:', error)
+      return res.status(500).json({ error: 'Failed to fetch user' })
     }
-
-    await PasswordResetToken.destroy({
-      where: { userId: user.id }
-    })
-
-    const token = crypto.randomBytes(32).toString('hex')
-
-    await PasswordResetToken.create({
-      userId: user.id,
-      token,
-      expiresAt: new Date(Date.now() + 30 * 60 * 1000)
-    })
-
-    const frontendUrl = process.env.FRONTEND_URL
-    const resetLink = `${frontendUrl}/reset-password?token=${token}`
-
-    await transporter.sendMail({
-      from: '"PresentAI" <no-reply@presentai.com>',
-      to: user.email,
-      subject: 'Recuperar contraseña',
-      html: `
-    <h2>Recuperación de contraseña</h2>
-    <p>Haz click en el siguiente enlace:</p>
-    <a href="${resetLink}">Restablecer contraseña</a>
-    <p>Este enlace expira en 30 minutos.</p>
-  `
-    })
-
-    res.json({ message: 'Correo enviado' })
   }
 
   // GET /auth/validate-reset-token?token=xxx
