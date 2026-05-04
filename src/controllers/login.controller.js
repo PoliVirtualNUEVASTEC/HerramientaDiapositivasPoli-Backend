@@ -42,14 +42,14 @@ export class LoginController {
     // })
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'lax',
       secure: true,
       maxAge: 15 * 60 * 1000
     })
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'lax',
       secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
@@ -88,7 +88,7 @@ export class LoginController {
       // })
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         secure: true,
         maxAge: 15 * 60 * 1000
       })
@@ -158,7 +158,8 @@ export class LoginController {
       expiresAt: new Date(Date.now() + 30 * 60 * 1000)
     })
 
-    const resetLink = `http://localhost:5173/reset-password?token=${token}`
+    const frontendUrl = process.env.FRONTEND_URL
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`
 
     await transporter.sendMail({
       from: '"PresentAI" <no-reply@presentai.com>',
