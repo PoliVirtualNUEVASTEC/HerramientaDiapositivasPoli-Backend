@@ -73,4 +73,18 @@ export class UserController {
       return res.status(500).json({ error: 'Failed to delete user' })
     }
   }
+
+  async deleteTestUser (req, res) {
+    try {
+      const user = await User.findOne({ where: { email: 'juan_perez_test@elpoli.edu.co' } })
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' })
+      }
+      await user.destroy()
+      return res.status(204).send()
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      return res.status(500).json({ error: 'Failed to delete user' })
+    }
+  }
 }
