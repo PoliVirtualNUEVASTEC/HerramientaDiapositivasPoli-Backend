@@ -39,6 +39,7 @@ Reglas obligatorias:
 15. Si el texto es muy largo, sintetiza y organiza por temas.
 16. Si el contenido es académico, usa tono formal, claro y pedagógico.
 17. La presentación debe tener aproximadamente ${numberOfSlides} diapositivas.
+18. El idioma de salida de la presentación tiene que estar en el mismo idioma que el texto de entrada.
 `
 
   const userPrompt = `
