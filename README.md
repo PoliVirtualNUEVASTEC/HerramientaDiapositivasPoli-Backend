@@ -1,132 +1,159 @@
 # HerramientaDiapositivasPoli Backend
 
-Backend de una herramienta para crear y administrar presentaciones a partir de texto o archivos PDF. La aplicación expone una API construida con Express, usa PostgreSQL con Sequelize para la persistencia, Supabase para almacenamiento de imágenes y servicios de IA para generar la estructura de las diapositivas.
+Backend en Node.js y Express para generar, almacenar y administrar presentaciones academicas. El sistema recibe texto libre o archivos PDF, usa OpenAI para estructurar diapositivas, resuelve imagenes con Pexels, persiste la informacion en PostgreSQL mediante Sequelize y almacena imagenes de usuario en Supabase Storage.
 
-## Descripción
+## Proposito del sistema
 
-Este proyecto permite:
+Este backend soporta una plataforma de creacion de presentaciones orientada a usuarios autenticados. Sus capacidades principales son:
 
-- Registrar y autenticar usuarios con JWT y cookies HTTP-only.
-- Recuperar contraseña por correo electrónico.
-- Crear presentaciones desde texto libre o desde un archivo PDF.
-- Generar diapositivas y elementos con apoyo de OpenAI.
-- Resolver imágenes relacionadas con el contenido usando Pexels.
-- Gestionar presentaciones, diapositivas, elementos e imágenes del usuario.
-- Almacenar imágenes optimizadas en Supabase Storage y ejecutar limpieza automática de archivos antiguos.
+- registro y autenticacion de usuarios con JWT en cookies HTTP-only;
+- recuperacion de contrasena por correo con tokens temporales;
+- generacion de presentaciones desde texto o PDF;
+- persistencia de presentaciones, diapositivas y elementos editables;
+- subida, optimizacion y limpieza automatica de imagenes de usuario.
 
-## Tecnologías y dependencias
+## Tecnologias utilizadas
 
-### Dependencias principales
+| Categoria | Tecnologia |
+| --- | --- |
+| Runtime | Node.js |
+| Framework HTTP | Express 5 |
+| ORM | Sequelize 6 |
+| Base de datos | PostgreSQL |
+| Autenticacion | JWT + cookies HTTP-only |
+| Hashing | bcrypt |
+| Archivos | multer, sharp, pdf-parse |
+| Storage | Supabase Storage |
+| IA | OpenAI Responses API |
+| Imagenes externas | Pexels API |
+| Email transaccional | Resend |
+| Utilidades | cookie-parser, cors, dotenv |
 
-- `express`: servidor HTTP y definición de rutas.
-- `sequelize` y `pg`: conexión y modelado sobre PostgreSQL.
-- `@supabase/supabase-js`: acceso a Supabase y almacenamiento de archivos.
-- `openai`: generación de presentaciones con IA.
-- `pdf-parse` y `pdfjs-dist`: lectura y extracción de texto desde PDF.
-- `multer`: carga de archivos.
-- `sharp`: optimización y conversión de imágenes.
-- `bcrypt`: hash de contraseñas.
-- `jsonwebtoken`: generación y validación de tokens.
-- `cookie-parser`: lectura de cookies.
-- `cors`: configuración de acceso entre frontend y backend.
-- `dotenv`: carga de variables de entorno.
-- `nodemailer`: envío de correos para recuperación de contraseña.
+## Arquitectura general
 
-### Dependencias de desarrollo
+El proyecto sigue una arquitectura por capas ligera:
 
-- `nodemon`: recarga automática en desarrollo.
-- `standard`: reglas de estilo y linting.
+- `routes/` define los endpoints y compone middlewares.
+- `controllers/` orquesta validacion basica, llamadas a servicios y respuestas HTTP.
+- `services/` contiene la logica de negocio e integraciones externas.
+- `models/` define entidades Sequelize y sus relaciones.
+- `middleware/` centraliza autenticacion, uploads y ownership checks.
+- `db/` encapsula conexiones a PostgreSQL y Supabase.
+- `utils/` reune helpers de JWT y validacion de payloads.
 
-## Requisitos previos
+## Instalacion
 
-Antes de iniciar, asegúrate de contar con:
-
-- Node.js
-- npm
-- Una base de datos PostgreSQL accesible mediante `DATABASE_URL`
-- Un proyecto de Supabase con bucket de almacenamiento
-- Claves de OpenAI y Pexels
-- Una cuenta de correo para el envío de recuperación de contraseña
-
-## Variables de entorno
-
-Crea un archivo `.env` en la raíz del proyecto con una configuración similar a esta:
-
-```env
-PORT=3000
-ALLOWED_ORIGINS=http://localhost:5173
-
-DATABASE_URL=postgresql://usuario:password@host:5432/database
-
-SUPABASE_URL=https://tu-proyecto.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
-SUPABASE_IMAGE_BUCKET=user-images
-
-JWT_ACCESS_SECRET=tu_access_secret
-JWT_REFRESH_SECRET=tu_refresh_secret
-
-OPENAI_API_KEY=tu_openai_api_key
-OPENAI_MODEL=gpt-4.1-mini
-
-PEXELS_API_KEY=tu_pexels_api_key
-
-EMAIL=tu_correo@gmail.com
-EMAIL_PASS=tu_clave_o_app_password
-
-USER_IMAGE_MAX_ITEMS=50
-USER_IMAGE_MAX_AGE_DAYS=90
-USER_IMAGE_MAX_DIMENSION=1920
-USER_IMAGE_QUALITY=82
-USER_IMAGE_MAX_UPLOAD_MB=8
-USER_IMAGE_CLEANUP_INTERVAL_HOURS=12
-```
-
-### Notas sobre configuración
-
-- `ALLOWED_ORIGINS` acepta varios orígenes separados por comas.
-- `SUPABASE_IMAGE_BUCKET` es opcional y por defecto usa `user-images`.
-- `OPENAI_MODEL` es opcional y por defecto usa `gpt-4.1-mini`.
-- Las variables `USER_IMAGE_*` controlan límites, optimización y limpieza automática de imágenes.
-
-## Instalación
-
-1. Clona el repositorio.
-2. Entra a la carpeta del proyecto.
-3. Instala las dependencias:
+1. Instalar dependencias:
 
 ```bash
 npm install
 ```
 
-4. Crea y configura el archivo `.env`.
+2. Crear un archivo `.env` en la raiz.
 
-## Cómo iniciar el proyecto
+3. Configurar una base PostgreSQL accesible por `DATABASE_URL`.
 
-Para ejecutar el servidor en desarrollo:
+4. Crear o reutilizar un bucket en Supabase Storage.
+
+5. Configurar claves de OpenAI, Pexels y Resend.
+
+6. Ejecutar en desarrollo:
 
 ```bash
 npm run dev
 ```
 
-El servidor inicia en el puerto definido por `PORT`. Si no se configura, usa `3000`.
+## Variables de entorno
+
+Variables detectadas directamente desde el codigo:
+
+| Variable | Requerida | Uso |
+| --- | --- | --- |
+| `PORT` | No | Puerto HTTP. Por defecto `3000`. |
+| `ALLOWED_ORIGINS` | Si en entornos browser | Lista CSV de origenes permitidos por CORS. |
+| `DATABASE_URL` | Si | Conexion PostgreSQL para Sequelize. |
+| `SUPABASE_URL` | Si | URL del proyecto Supabase. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Si | Credencial de servicio para Storage. |
+| `SUPABASE_IMAGE_BUCKET` | No | Bucket de imagenes. Por defecto `user-images`. |
+| `JWT_ACCESS_SECRET` | Si | Firma del access token. |
+| `JWT_REFRESH_SECRET` | Si | Firma del refresh token. |
+| `FRONTEND_URL` | Si para reset password | Base URL del frontend para construir el enlace de recuperacion. |
+| `RESEND_API_KEY` | Si para reset password | Envio de correos transaccionales. |
+| `OPENAI_API_KEY` | Si | Generacion de presentaciones. |
+| `OPENAI_MODEL` | No | Modelo OpenAI. Por defecto `gpt-4.1-mini`. |
+| `PEXELS_API_KEY` | Si para resolver imagenes | Busqueda de imagenes. |
+| `USER_IMAGE_MAX_ITEMS` | No | Limite maximo de imagenes por usuario. |
+| `USER_IMAGE_MAX_AGE_DAYS` | No | TTL funcional de imagenes no accedidas. |
+| `USER_IMAGE_MAX_DIMENSION` | No | Tamano maximo para resize de imagenes. |
+| `USER_IMAGE_QUALITY` | No | Calidad de compresion WebP. |
+| `USER_IMAGE_MAX_UPLOAD_MB` | No | Tamano maximo de upload de imagen. |
+| `USER_IMAGE_CLEANUP_INTERVAL_HOURS` | No | Frecuencia del mantenimiento de imagenes. |
+
+Ejemplo minimo:
+
+```env
+PORT=3000
+ALLOWED_ORIGINS=http://localhost:5173
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+JWT_ACCESS_SECRET=replace-me
+JWT_REFRESH_SECRET=replace-me-too
+FRONTEND_URL=http://localhost:5173
+RESEND_API_KEY=re_xxx
+OPENAI_API_KEY=sk-proj-xxx
+PEXELS_API_KEY=pexels-xxx
+```
 
 ## Scripts disponibles
 
-- `npm run dev`: inicia el backend con `nodemon`.
-- `npm test`: actualmente no tiene pruebas configuradas y devuelve un mensaje por defecto.
+| Script | Descripcion |
+| --- | --- |
+| `npm run dev` | Inicia el backend con `nodemon src/index.js`. |
+| `npm test` | Script placeholder; actualmente falla de forma intencional. |
 
-## Estructura general de la API
+## Estructura de carpetas
 
-Las rutas principales del proyecto son:
+```text
+src/
+  app.js
+  index.js
+  config/
+  controllers/
+  db/
+  middleware/
+  models/
+  routes/
+  schemas/
+  services/
+  slides_templates/
+  utils/
+docs/
+```
 
-- `/api/users`: gestión de usuarios.
-- `/api/auth`: login, refresh, logout, perfil y recuperación de contraseña.
-- `/api/presentations`: creación y consulta de presentaciones.
-- `/api/slides`: gestión de diapositivas.
-- `/api/slide-elements`: gestión de elementos dentro de una diapositiva.
-- `/api/user-images`: carga, consulta y eliminación de imágenes del usuario.
+## Resumen tecnico del backend
 
-## Colaboradores
+- La aplicacion esta orientada a una API REST stateful en cliente web, porque la autenticacion protegida depende de cookies.
+- La generacion de presentaciones esta desacoplada en servicios: OpenAI crea la estructura, Pexels resuelve imagenes y Sequelize persiste la salida.
+- El backend no usa migraciones ni pruebas automatizadas en el repositorio actual.
+- Existen riesgos importantes a corregir: secretos presentes en `.env`, controles de ownership incompletos en varios recursos y una inconsistencia en el reseteo de contrasena.
 
-- Miguel Angel Mejía Suarez - miguel_mejia82201@elpoli.edu.co
-- Juan José Estrada Vélez - juan_estrada82212@elpoli.edu.co
+## Estado actual y deuda tecnica detectada
+
+- No existe carpeta de migraciones ni estrategia de versionado del esquema.
+- Hay logging de depuracion en controladores y middlewares.
+- Algunos endpoints protegidos no validan ownership del recurso, solo autenticacion.
+
+
+Documentacion tecnica detallada:
+
+- [Arquitectura](docs/ARCHITECTURE.md)
+- [API](docs/API.md)
+- [Base de datos](docs/DATABASE.md)
+- [Autenticacion](docs/AUTH.md)
+- [Servicios](docs/SERVICES.md)
+- [Archivos](docs/FILES.md)
+- [Despliegue](docs/DEPLOYMENT.md)
+- [Seguridad](docs/SECURITY.md)
+- [Contribucion](docs/CONTRIBUTING.md)
+- [Resumen tecnico](docs/SUMMARY.md)
