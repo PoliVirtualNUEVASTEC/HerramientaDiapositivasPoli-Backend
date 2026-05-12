@@ -25,30 +25,18 @@ export class LoginController {
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
 
-    // guardar refresh token en DB
     await user.update({ refreshToken })
 
-    // res.cookie('accessToken', accessToken, {
-    //   httpOnly: true,
-    //   sameSite: 'lax',
-    //   maxAge: 15 * 60 * 1000
-    // })
-
-    // res.cookie('refreshToken', refreshToken, {
-    //   httpOnly: true,
-    //   sameSite: 'lax',
-    //   maxAge: 7 * 24 * 60 * 60 * 1000
-    // })
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'lax',
       secure: true,
       maxAge: 15 * 60 * 1000
     })
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'lax',
       secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
@@ -79,15 +67,9 @@ export class LoginController {
 
       const newAccessToken = generateAccessToken(user)
 
-      // res.cookie('accessToken', newAccessToken, {
-      //   httpOnly: true,
-      //   sameSite: 'lax',
-      //   secure: false,
-      //   maxAge: 15 * 60 * 1000
-      // })
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         secure: true,
         maxAge: 15 * 60 * 1000
       })
