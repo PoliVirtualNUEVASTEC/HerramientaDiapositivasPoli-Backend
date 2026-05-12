@@ -21,10 +21,10 @@
 
 ```mermaid
 flowchart LR
-  Client[Cliente] --> Upload[multer en memoria]
-  Upload --> Validate[MIME y tamano]
-  Validate --> Parse[PDFParse.getText()]
-  Parse --> Presentation[Generacion de presentacion]
+  Client[Cliente] --> Upload["multer en memoria"]
+  Upload --> Validate["MIME y tamaño"]
+  Validate --> Parse["PDFParse.getText()"]
+  Parse --> Presentation["Generación de presentación"]
 ```
 
 ### Comportamiento funcional

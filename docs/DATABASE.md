@@ -138,55 +138,55 @@ erDiagram
   Slide ||--o{ SlideElement : contains
 
   User {
-    int id PK
+    int id "PK"
     text fullName
-    string email UNIQUE
+    string email "UNIQUE"
     string passwordHash
     string refreshToken
   }
 
   PasswordResetToken {
-    int id PK
-    int userId FK
+    int id "PK"
+    int userId "FK"
     string token
     date expiresAt
     date createdAt
   }
 
   Presentation {
-    int id PK
-    int userId FK
+    int id "PK"
+    int userId "FK"
     string title
     text description
-    jsonb theme
+    json theme
   }
 
   Slide {
-    int id PK
-    int presentationId FK
+    int id "PK"
+    int presentationId "FK"
     string title
     int slideOrder
-    jsonb background
+    json background
   }
 
   SlideElement {
-    int id PK
-    int slideId FK
-    enum type
-    jsonb content
+    int id "PK"
+    int slideId "FK"
+    string type
+    json content
     float positionX
     float positionY
     float width
     float height
-    jsonb styles
+    json styles
     int order
   }
 
   UserImage {
-    int id PK
-    int userId FK
+    int id "PK"
+    int userId "FK"
     text url
-    string path UNIQUE
+    string path "UNIQUE"
     string contentHash
     date lastAccessedAt
   }

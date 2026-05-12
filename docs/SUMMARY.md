@@ -44,11 +44,10 @@ El backend es una API REST en Express 5 con Sequelize sobre PostgreSQL. Atiende 
 
 ## Riesgos prioritarios
 
-1. Secretos presentes en `.env` del workspace.
-2. Ownership incompleto en endpoints de `users`, `presentations` y `slides`.
-3. `reset-password` actualiza un campo incorrecto (`password` en vez de `passwordHash`).
-4. Los endpoints de usuarios pueden exponer `passwordHash` y `refreshToken`.
-5. No hay rate limiting ni proteccion CSRF dedicada.
+1. Ownership incompleto en endpoints de `users`, `presentations` y `slides`.
+2. `reset-password` actualiza un campo incorrecto (`password` en vez de `passwordHash`).
+3. Los endpoints de usuarios pueden exponer `passwordHash` y `refreshToken`.
+4. No hay rate limiting ni proteccion CSRF dedicada.
 
 ## Mejoras arquitectonicas sugeridas
 
