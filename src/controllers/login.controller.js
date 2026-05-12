@@ -164,7 +164,7 @@ export class LoginController {
       const resend = new Resend(process.env.RESEND_API_KEY)
 
       await resend.emails.send({
-        from: 'onboarding@resend.dev',
+        from: 'no-replay@presentai-mail.juajsia.lat',
         to: user.email,
         subject: 'Recuperar contraseña',
         html: `
