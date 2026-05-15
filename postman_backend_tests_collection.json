@@ -1,0 +1,1028 @@
+{
+  "info": {
+    "name": "HerramientaDiapositivasPoli Backend - Postman Tests",
+    "description": "Colección de pruebas para el backend. Incluye creación de usuario, login, presentaciones, slides, elementos de slide y gestión de imágenes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_cookie",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "test_user_fullname",
+      "value": "Juan Perez Test2",
+      "type": "string"
+    },
+    {
+      "key": "test_user_email",
+      "value": "juan_perez_test2@elpoli.edu.co",
+      "type": "string"
+    },
+    {
+      "key": "test_user_password",
+      "value": "Test1234!",
+      "type": "string"
+    },
+    {
+      "key": "presentation_text",
+      "value": "Los desastres naturales son eventos catastróficos causados por fenómenos geológicos, meteorológicos o hidrológicos. Entre los más comunes se encuentran los terremotos, huracanes, inundaciones y erupciones volcánicas. Estos eventos afectan comunidades, infraestructura y el medio ambiente, y requieren planes de respuesta rápida, evacuación y recuperación. La preparación incluye educación comunitaria, sistemas de alerta y esfuerzos de reconstrucción sostenible.",
+      "type": "string"
+    },
+    {
+      "key": "number_of_slides",
+      "value": "5",
+      "type": "string"
+    },
+    {
+      "key": "slide_background",
+      "value": "#F0F8FF",
+      "type": "string"
+    },
+    {
+      "key": "presentation_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "slide_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "slide_element_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_image_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reset_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Crear usuario de prueba",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"{{test_user_fullname}}\",\n  \"email\": \"{{test_user_email}}\",\n  \"password\": \"{{test_user_password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Usuario creado o ya existe', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Login y guardar cookies",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{test_user_email}}\",\n  \"password\": \"{{test_user_password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login exitoso', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const setCookieHeaders = pm.response.headers.filter(function (header) {",
+              "    return header.key.toLowerCase() === 'set-cookie';",
+              "});",
+              "if (setCookieHeaders.length) {",
+              "    const cookiePairs = setCookieHeaders.map(function (header) { return header.value.split(';')[0]; }).join('; ');",
+              "    const existing = pm.collectionVariables.get('auth_cookie') || '';",
+              "    const merged = existing ? existing + '; ' + cookiePairs : cookiePairs;",
+              "    pm.collectionVariables.set('auth_cookie', merged);",
+              "    pm.test('Cookie guardada', function () { pm.expect(merged).to.not.be.empty; });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Refresh token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/refresh",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "refresh"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Refresh token exitoso', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const setCookieHeaders = pm.response.headers.filter(function (header) {",
+              "    return header.key.toLowerCase() === 'set-cookie';",
+              "});",
+              "if (setCookieHeaders.length) {",
+              "    const cookiePairs = setCookieHeaders.map(function (header) { return header.value.split(';')[0]; }).join('; ');",
+              "    const existing = pm.collectionVariables.get('auth_cookie') || '';",
+              "    const merged = existing ? existing + '; ' + cookiePairs : cookiePairs;",
+              "    pm.collectionVariables.set('auth_cookie', merged);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Obtener perfil",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/profile",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "profile"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Perfil obtenido', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "    pm.expect(pm.response.json()).to.have.property('email', pm.collectionVariables.get('test_user_email'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Crear presentación desde texto",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"{{presentation_text}}\",\n  \"numberOfSlides\": {{number_of_slides}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/presentations/text",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "presentations",
+            "text"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Presentación creada desde texto', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "    pm.expect(pm.response.json()).to.have.property('presentationId');",
+              "});",
+              "pm.collectionVariables.set('presentation_id', pm.response.json().presentationId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Crear presentación desde PDF",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "postman_data_test/Cultura_Pizza.pdf"
+            },
+            {
+              "key": "numberOfSlides",
+              "value": "5",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/presentations/pdf",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "presentations",
+            "pdf"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Presentación creada desde PDF', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "    pm.expect(pm.response.json()).to.have.property('presentationId');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Obtener presentaciones",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/presentations",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "presentations"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Lista de presentaciones obtenida', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Crear diapositiva",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"presentationId\": \"{{presentation_id}}\",\n  \"title\": \"Introducción a desastres naturales\",\n  \"background\": \"{{slide_background}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/slides/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slides"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Slide creado', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "    pm.expect(pm.response.json()).to.have.property('id');",
+              "});",
+              "pm.collectionVariables.set('slide_id', pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Obtener slides de presentación",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/slides/{{presentation_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slides",
+            "{{presentation_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Slides de presentación obtenidos', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Obtener slide por ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/slides/slide/{{slide_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slides",
+            "slide",
+            "{{slide_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Slide por ID obtenido', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "    pm.expect(pm.response.json()).to.have.property('id', parseInt(pm.collectionVariables.get('slide_id')));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Actualizar slide",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Diapositiva actualizada sobre desastres naturales\",\n  \"background\": \"#FFF8DC\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/slides/{{slide_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slides",
+            "{{slide_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Slide actualizado', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "    pm.expect(pm.response.json()).to.have.property('title', 'Diapositiva actualizada sobre desastres naturales');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12. Duplicar slide",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/slides/{{slide_id}}/duplicate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slides",
+            "{{slide_id}}",
+            "duplicate"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Slide duplicado', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "    pm.expect(pm.response.json()).to.have.property('id');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13. Crear elemento en slide",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"slideId\": {{slide_id}},\n  \"type\": \"title\",\n  \"content\": { \"text\": \"Impactos y prevención de desastres naturales\" },\n  \"positionX\": 40,\n  \"positionY\": 40,\n  \"width\": 600,\n  \"height\": 180,\n  \"styles\": { \"color\": \"#1a1a1a\", \"fontSize\": \"28px\" },\n  \"order\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/slide-elements/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slide-elements"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Elemento de slide creado', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "    pm.expect(pm.response.json()).to.have.property('id');",
+              "});",
+              "pm.collectionVariables.set('slide_element_id', pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14. Obtener elementos del slide",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/slide-elements/slide/{{slide_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slide-elements",
+            "slide",
+            "{{slide_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Elementos del slide obtenidos', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15. Obtener elemento de slide por ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/slide-elements/{{slide_element_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slide-elements",
+            "{{slide_element_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Elemento de slide obtenido por ID', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "    pm.expect(pm.response.json()).to.have.property('id', parseInt(pm.collectionVariables.get('slide_element_id')));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16. Actualizar elemento de slide",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"text\",\n  \"content\": { \"text\": \"El estudio de desastres naturales debe incluir mitigación y respuesta comunitaria.\" },\n  \"positionX\": 35,\n  \"positionY\": 55,\n  \"width\": 620,\n  \"height\": 170\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/slide-elements/{{slide_element_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slide-elements",
+            "{{slide_element_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Elemento de slide actualizado', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "    pm.expect(pm.response.json().type).to.eql('text');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17. Subir imagen de usuario",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "postman_data_test/polijic.png"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/user-images/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "user-images"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Imagen subida', function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "    pm.expect(pm.response.json()).to.have.property('image');",
+              "});",
+              "pm.collectionVariables.set('user_image_id', pm.response.json().image.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18. Listar imágenes de usuario",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/user-images",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "user-images"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Listado de imágenes obtenido', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19. Marcar imagen como accedida",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/user-images/{{user_image_id}}/access",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "user-images",
+            "{{user_image_id}}",
+            "access"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Imagen marcada como accedida', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20. Eliminar imagen de usuario",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/user-images/{{user_image_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "user-images",
+            "{{user_image_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Imagen eliminada', function () {",
+              "    pm.expect(pm.response.code).to.eql(204);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21. Eliminar slide",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/slides/{{slide_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "slides",
+            "{{slide_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Slide eliminado', function () {",
+              "    pm.expect(pm.response.code).to.eql(204);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22. Eliminar presentación",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "{{auth_cookie}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/presentations/{{presentation_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "presentations",
+            "{{presentation_id}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Presentación eliminada', function () {",
+              "    pm.expect(pm.response.code).to.eql(204);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23. Solicitar recuperación de contraseña",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{test_user_email}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/forgot-password",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "forgot-password"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "24. Validar token de recuperación (opcional)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/auth/validate-reset-token?token={{reset_token}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "validate-reset-token"
+          ],
+          "query": [
+            {
+              "key": "token",
+              "value": "{{reset_token}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "25. Restablecer contraseña (opcional)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{reset_token}}\",\n  \"newPassword\": \"NewPass123!\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/reset-password",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "reset-password"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
